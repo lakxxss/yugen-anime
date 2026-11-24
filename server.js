@@ -15,6 +15,7 @@ const HOST = process.env.HOST || (process.env.PORT ? '0.0.0.0' : '127.0.0.1');
 const SESSION_MS = 7 * 24 * 60 * 60 * 1000;
 const sessions = new Map();
 const authAttempts = new Map();
+const catalogCache = new Map();
 const mime = { '.html':'text/html; charset=utf-8', '.css':'text/css; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.json':'application/json; charset=utf-8', '.svg':'image/svg+xml', '.ico':'image/x-icon' };
 let writeQueue = Promise.resolve();
 let pgPool = null;
@@ -92,6 +93,20 @@ async function readBody(req) {
   try { return JSON.parse(raw || '{}'); }
   catch { throw Object.assign(new Error('Please check the submitted information.'), { status: 400 }); }
 }
+async function fetchKitsuJson(key, url) {
+  const now = Date.now();
+  const cached = catalogCache.get(key);
+  if (cached && cached.expiresAt > now) return cached.value;
+  const response = await fetch(url, { headers: { Accept: 'application/vnd.api+json' }, signal: AbortSignal.timeout(8000) });
+  if (!response.ok) throw Object.assign(new Error('The anime catalog is temporarily unavailable.'), { status: 502 });
+  const value = await response.json();
+  catalogCache.set(key, { value, expiresAt: now + 5 * 60 * 1000 });
+  if (catalogCache.size > 250) {
+    for (const [cacheKey, entry] of catalogCache) if (entry.expiresAt <= now) catalogCache.delete(cacheKey);
+    while (catalogCache.size > 250) catalogCache.delete(catalogCache.keys().next().value);
+  }
+  return value;
+}
 async function issueSession(user, req, res) {
   const token = crypto.randomBytes(32).toString('base64url');
   const expiresAt = new Date(Date.now() + SESSION_MS);
@@ -122,6 +137,44 @@ async function api(req, res, url) {
     if (!pgPool) return send(res, process.env.NODE_ENV === 'production' ? 503 : 200, { ok: !process.env.NODE_ENV || process.env.NODE_ENV !== 'production', database: 'local' });
     await pgPool.query('SELECT 1');
     return send(res, 200, { ok: true, database: 'postgres' });
+  }
+  if (req.method === 'GET' && url.pathname === '/api/catalog') {
+    const search = (url.searchParams.get('q') || '').trim().slice(0, 120);
+    const status = url.searchParams.get('status') || '';
+    const ids = (url.searchParams.get('ids') || '').split(',').map(id => id.trim()).filter(id => /^\d{1,12}$/.test(id)).slice(0, 50);
+    const offset = Math.min(10000, Math.max(0, Number.parseInt(url.searchParams.get('offset') || '0', 10) || 0));
+    const genres = { action:'action', fantasy:'fantasy', romance:'romance', 'sci-fi':'science-fiction', 'slice of life':'slice-of-life', comedy:'comedy', drama:'drama' };
+    const genreInput = (url.searchParams.get('genre') || '').trim().toLowerCase();
+    const kitsuUrl = new URL('https://kitsu.io/api/edge/anime');
+    kitsuUrl.searchParams.set('page[limit]', ids.length ? String(ids.length) : '20');
+    kitsuUrl.searchParams.set('page[offset]', String(offset));
+    kitsuUrl.searchParams.set('include', 'categories,streamingLinks');
+    kitsuUrl.searchParams.set('fields[anime]', 'slug,synopsis,titles,averageRating,userCount,startDate,nextRelease,status,episodeCount,episodeLength,posterImage,youtubeVideoId,subtype,nsfw');
+    kitsuUrl.searchParams.set('fields[categories]', 'title,slug');
+    kitsuUrl.searchParams.set('fields[streamingLinks]', 'url,subs,dubs');
+    if (ids.length) kitsuUrl.searchParams.set('filter[id]', ids.join(','));
+    else if (search) { kitsuUrl.searchParams.set('filter[text]', search); kitsuUrl.searchParams.set('sort', '-userCount'); }
+    else {
+      if (status === 'current') kitsuUrl.searchParams.set('filter[status]', 'current');
+      if (genres[genreInput]) kitsuUrl.searchParams.set('filter[categories]', genres[genreInput]);
+      kitsuUrl.searchParams.set('sort', status === 'current' ? '-nextRelease' : '-userCount');
+    }
+    try {
+      const payload = await fetchKitsuJson(`catalog:${kitsuUrl.toString()}`, kitsuUrl);
+      return send(res, 200, payload, { 'Cache-Control': 'public, max-age=300' });
+    } catch (error) { return send(res, error.status || 502, { error: 'The anime catalog is temporarily unavailable.' }); }
+  }
+  const episodeMatch = url.pathname.match(/^\/api\/catalog\/(\d{1,12})\/episodes$/);
+  if (req.method === 'GET' && episodeMatch) {
+    const offset = Math.min(2000, Math.max(0, Number.parseInt(url.searchParams.get('offset') || '0', 10) || 0));
+    const kitsuUrl = new URL(`https://kitsu.io/api/edge/anime/${episodeMatch[1]}/episodes`);
+    kitsuUrl.searchParams.set('page[limit]', '20');
+    kitsuUrl.searchParams.set('page[offset]', String(offset));
+    kitsuUrl.searchParams.set('sort', 'number');
+    try {
+      const payload = await fetchKitsuJson(`episodes:${episodeMatch[1]}:${offset}`, kitsuUrl);
+      return send(res, 200, { ...payload, hasMore: Boolean(payload.links?.next) }, { 'Cache-Control': 'public, max-age=300' });
+    } catch (error) { return send(res, error.status || 502, { error: 'Episode details are temporarily unavailable.' }); }
   }
   if (req.method === 'GET' && url.pathname === '/api/me') {
     const user = await findSessionUser(req);
