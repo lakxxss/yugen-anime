@@ -142,6 +142,7 @@ async function api(req, res, url) {
     const mediaType = url.searchParams.get('type') === 'manga' ? 'manga' : 'anime';
     const search = (url.searchParams.get('q') || '').trim().slice(0, 120);
     const status = url.searchParams.get('status') || '';
+    const currentOnly = mediaType === 'anime' && status === 'current';
     const ids = (url.searchParams.get('ids') || '').split(',').map(id => id.trim()).filter(id => /^\d{1,12}$/.test(id)).slice(0, 50);
     const offset = Math.min(10000, Math.max(0, Number.parseInt(url.searchParams.get('offset') || '0', 10) || 0));
     const genres = { action:'action', fantasy:'fantasy', romance:'romance', 'sci-fi':'science-fiction', 'slice of life':'slice-of-life', comedy:'comedy', drama:'drama' };
@@ -152,13 +153,13 @@ async function api(req, res, url) {
     kitsuUrl.searchParams.set('include', mediaType === 'manga' ? 'categories' : 'categories,streamingLinks');
     kitsuUrl.searchParams.set(`fields[${mediaType}]`, mediaType === 'manga' ? 'slug,synopsis,titles,averageRating,userCount,startDate,endDate,status,chapterCount,volumeCount,posterImage,subtype,serialization' : 'slug,synopsis,titles,averageRating,userCount,startDate,nextRelease,status,episodeCount,episodeLength,posterImage,youtubeVideoId,subtype,nsfw');
     kitsuUrl.searchParams.set('fields[categories]', 'title,slug');
-    kitsuUrl.searchParams.set('fields[streamingLinks]', 'url,subs,dubs');
+    if (mediaType === 'anime') kitsuUrl.searchParams.set('fields[streamingLinks]', 'url,subs,dubs');
     if (ids.length) kitsuUrl.searchParams.set('filter[id]', ids.join(','));
     else if (search) { kitsuUrl.searchParams.set('filter[text]', search); kitsuUrl.searchParams.set('sort', '-userCount'); }
     else {
-      if (status === 'current') kitsuUrl.searchParams.set('filter[status]', 'current');
+      if (currentOnly) kitsuUrl.searchParams.set('filter[status]', 'current');
       if (genres[genreInput]) kitsuUrl.searchParams.set('filter[categories]', genres[genreInput]);
-      kitsuUrl.searchParams.set('sort', status === 'current' ? '-nextRelease' : '-userCount');
+      kitsuUrl.searchParams.set('sort', currentOnly ? '-nextRelease' : '-userCount');
     }
     try {
       const payload = await fetchKitsuJson(`catalog:${kitsuUrl.toString()}`, kitsuUrl);
