@@ -139,17 +139,18 @@ async function api(req, res, url) {
     return send(res, 200, { ok: true, database: 'postgres' });
   }
   if (req.method === 'GET' && url.pathname === '/api/catalog') {
+    const mediaType = url.searchParams.get('type') === 'manga' ? 'manga' : 'anime';
     const search = (url.searchParams.get('q') || '').trim().slice(0, 120);
     const status = url.searchParams.get('status') || '';
     const ids = (url.searchParams.get('ids') || '').split(',').map(id => id.trim()).filter(id => /^\d{1,12}$/.test(id)).slice(0, 50);
     const offset = Math.min(10000, Math.max(0, Number.parseInt(url.searchParams.get('offset') || '0', 10) || 0));
     const genres = { action:'action', fantasy:'fantasy', romance:'romance', 'sci-fi':'science-fiction', 'slice of life':'slice-of-life', comedy:'comedy', drama:'drama' };
     const genreInput = (url.searchParams.get('genre') || '').trim().toLowerCase();
-    const kitsuUrl = new URL('https://kitsu.io/api/edge/anime');
+    const kitsuUrl = new URL(`https://kitsu.io/api/edge/${mediaType}`);
     kitsuUrl.searchParams.set('page[limit]', ids.length ? String(ids.length) : '20');
     kitsuUrl.searchParams.set('page[offset]', String(offset));
     kitsuUrl.searchParams.set('include', 'categories,streamingLinks');
-    kitsuUrl.searchParams.set('fields[anime]', 'slug,synopsis,titles,averageRating,userCount,startDate,nextRelease,status,episodeCount,episodeLength,posterImage,youtubeVideoId,subtype,nsfw');
+    kitsuUrl.searchParams.set(`fields[${mediaType}]`, mediaType === 'manga' ? 'slug,synopsis,titles,averageRating,userCount,startDate,endDate,status,chapterCount,volumeCount,posterImage,subtype,serialization,nsfw' : 'slug,synopsis,titles,averageRating,userCount,startDate,nextRelease,status,episodeCount,episodeLength,posterImage,youtubeVideoId,subtype,nsfw');
     kitsuUrl.searchParams.set('fields[categories]', 'title,slug');
     kitsuUrl.searchParams.set('fields[streamingLinks]', 'url,subs,dubs');
     if (ids.length) kitsuUrl.searchParams.set('filter[id]', ids.join(','));
