@@ -2,7 +2,7 @@
   "name": "yugen-anime-site",
   "version": "0.2.0",
   "private": true,
-  "description": "Yugen anime discovery website with optional accounts",
+  "description": "Yugen anime and manga finder with optional accounts",
   "scripts": {
     "start": "node server.js"
   },
