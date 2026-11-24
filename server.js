@@ -150,7 +150,7 @@ async function api(req, res, url) {
     kitsuUrl.searchParams.set('page[limit]', ids.length ? String(ids.length) : '20');
     kitsuUrl.searchParams.set('page[offset]', String(offset));
     kitsuUrl.searchParams.set('include', mediaType === 'manga' ? 'categories' : 'categories,streamingLinks');
-    kitsuUrl.searchParams.set(`fields[${mediaType}]`, mediaType === 'manga' ? 'slug,synopsis,titles,averageRating,userCount,startDate,endDate,status,chapterCount,volumeCount,posterImage,subtype,serialization,nsfw' : 'slug,synopsis,titles,averageRating,userCount,startDate,nextRelease,status,episodeCount,episodeLength,posterImage,youtubeVideoId,subtype,nsfw');
+    kitsuUrl.searchParams.set(`fields[${mediaType}]`, mediaType === 'manga' ? 'slug,synopsis,titles,averageRating,userCount,startDate,endDate,status,chapterCount,volumeCount,posterImage,subtype,serialization' : 'slug,synopsis,titles,averageRating,userCount,startDate,nextRelease,status,episodeCount,episodeLength,posterImage,youtubeVideoId,subtype,nsfw');
     kitsuUrl.searchParams.set('fields[categories]', 'title,slug');
     kitsuUrl.searchParams.set('fields[streamingLinks]', 'url,subs,dubs');
     if (ids.length) kitsuUrl.searchParams.set('filter[id]', ids.join(','));
