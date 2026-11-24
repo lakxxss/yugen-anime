@@ -1,27 +1,41 @@
-# Yūgen
+# Yūgen — Anime & Manga Finder
 
-Anime discovery site with optional email/password accounts and synced watchlists.
+Yūgen helps people discover anime and manga. Browse popular titles, search by title, filter by genre, open a details card, and save titles to a personal list. Accounts are optional; guest lists stay in the browser, and signed-in lists sync to PostgreSQL.
+
+The catalog is powered by public metadata from [Kitsu](https://kitsu.io). It shows anime episode counts and manga chapter/volume counts, and links to Kitsu or available external title services. Yūgen is a discovery catalog; it does not host full episodes or manga chapters.
+
+## Features
+
+- Separate anime and manga catalogs with title search, genre filters, and pagination.
+- Title details, synopsis, cover art, score, year, and episode or chapter/volume counts when available.
+- Episode guide for anime when Kitsu has episode data.
+- Personal saved list with optional account sync.
+- Responsive layout and official trailer previews for selected anime.
+
+Catalog coverage and metadata depend on Kitsu. The API returns up to 20 catalog records per page; use the “Load more” control to continue browsing.
 
 ## Run locally
 
-Install Node.js 22 or newer, open a terminal in this folder, then run:
+Use Node.js 22 or newer. From this directory run:
 
 ```sh
 npm install
 npm start
 ```
 
-Open <http://127.0.0.1:4173>. Without `DATABASE_URL`, local account records are saved in `data/users.json`. Keep that file private and do not commit it.
+Open <http://127.0.0.1:4173>.
 
-## Hosted preview
+Without `DATABASE_URL`, local account records are written to `data/users.json`; keep that file private and out of source control. Production mode requires PostgreSQL. At startup the app creates the account, list, and session tables. Session cookies use secure settings in production.
 
-The web service listens on the host's `PORT` and binds to `0.0.0.0` when that variable is set. Set `NODE_ENV=production` and provide `DATABASE_URL` for PostgreSQL. At startup, the app creates the account, watchlist, and session tables. In production, the server refuses to start without PostgreSQL; accounts are never saved to a deploy's temporary local disk.
+## API
 
-The included `render.yaml` prepares a free Render web service and prompts for `DATABASE_URL` as a secret. To preserve accounts beyond Render's free database preview, create a PostgreSQL project with a managed provider such as Neon, copy its connection string into the Render dashboard, and keep it out of source control. The app initializes its tables when it starts. The included Dockerfile can also be used by another container host.
+Yūgen’s HTTP API is documented in [docs/API.md](docs/API.md). It covers the anime/manga catalog, anime episode guide, health check, optional accounts, and saved lists.
 
-Render supports Node web services, deploys from Git, and supplies a public `onrender.com` address. Its free web service spins down after 15 idle minutes and can take about a minute to start again. Its free Postgres expires after 30 days, so the blueprint uses an external database connection instead. See [Render web services](https://render.com/docs/web-services) and [Render free instance limits](https://render.com/docs/free). Neon currently lists a free Postgres allowance of 1 GB storage and 100 compute-hours per project each month; see [Neon plans](https://neon.com/docs/introduction/plans).
+## Deployment
 
-## Before inviting public users
+The included `Dockerfile` and `render.yaml` support Render deployment. The web service listens on the configured `PORT`; production account sync needs a PostgreSQL connection string supplied as `DATABASE_URL`. Keep secrets in the host’s environment settings, never in Git.
 
-This is an initial account implementation. Add email verification, password reset, account deletion, privacy/terms pages, production backups, and durable rate limiting before treating it as a production identity system. The catalog is sample content; streaming requires licensed video sources.
+## Before a wider public launch
+
+Add email verification, password recovery and deletion, privacy/terms pages, production database backups, and durable rate limiting before relying on accounts as a public identity system.
 
