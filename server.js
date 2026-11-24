@@ -149,7 +149,7 @@ async function api(req, res, url) {
     const kitsuUrl = new URL(`https://kitsu.io/api/edge/${mediaType}`);
     kitsuUrl.searchParams.set('page[limit]', ids.length ? String(ids.length) : '20');
     kitsuUrl.searchParams.set('page[offset]', String(offset));
-    kitsuUrl.searchParams.set('include', 'categories,streamingLinks');
+    kitsuUrl.searchParams.set('include', mediaType === 'manga' ? 'categories' : 'categories,streamingLinks');
     kitsuUrl.searchParams.set(`fields[${mediaType}]`, mediaType === 'manga' ? 'slug,synopsis,titles,averageRating,userCount,startDate,endDate,status,chapterCount,volumeCount,posterImage,subtype,serialization,nsfw' : 'slug,synopsis,titles,averageRating,userCount,startDate,nextRelease,status,episodeCount,episodeLength,posterImage,youtubeVideoId,subtype,nsfw');
     kitsuUrl.searchParams.set('fields[categories]', 'title,slug');
     kitsuUrl.searchParams.set('fields[streamingLinks]', 'url,subs,dubs');
@@ -163,7 +163,7 @@ async function api(req, res, url) {
     try {
       const payload = await fetchKitsuJson(`catalog:${kitsuUrl.toString()}`, kitsuUrl);
       return send(res, 200, payload, { 'Cache-Control': 'public, max-age=300' });
-    } catch (error) { return send(res, error.status || 502, { error: 'The anime catalog is temporarily unavailable.' }); }
+    } catch (error) { return send(res, error.status || 502, { error: `The ${mediaType} catalog is temporarily unavailable.` }); }
   }
   const episodeMatch = url.pathname.match(/^\/api\/catalog\/(\d{1,12})\/episodes$/);
   if (req.method === 'GET' && episodeMatch) {
