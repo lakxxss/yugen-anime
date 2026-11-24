@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#09090d" />
+  <meta name="description" content="Discover your next anime obsession on Yūgen." />
+  <title>Yūgen — Anime, in another world</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#home" aria-label="Yūgen home"><span class="brand-mark">幽</span><span class="brand-word">yūgen<span class="brand-dot">.</span></span></a>
+      <div class="side-label">MENU</div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <a class="nav-link active" href="#home" data-page="home"><span class="nav-icon">⌂</span>Home</a>
+        <a class="nav-link" href="#schedule" data-page="schedule"><span class="nav-icon">◷</span>Schedule<span class="nav-badge">3</span></a>
+        <a class="nav-link" href="#my-list" data-page="my-list"><span class="nav-icon">♡</span>My list</a>
+      </nav>
+      <div class="side-divider"></div>
+      <div class="side-label">YOUR VIBE</div>
+      <div class="genre-list">
+        <button class="genre-link" data-genre="Action"><i class="genre-dot coral"></i>Action</button>
+        <button class="genre-link" data-genre="Fantasy"><i class="genre-dot violet"></i>Fantasy</button>
+        <button class="genre-link" data-genre="Romance"><i class="genre-dot pink"></i>Romance</button>
+        <button class="genre-link" data-genre="Sci-Fi"><i class="genre-dot blue"></i>Sci-Fi</button>
+        <button class="genre-link" data-genre="Slice of Life"><i class="genre-dot yellow"></i>Slice of life</button>
+      </div>
+      <div class="sidebar-bottom"><div class="side-promo"><span class="promo-spark">✦</span><p>Your next<br><b>favorite world</b><br>is one click away.</p><a href="#catalog" data-page="home">Explore anime <span>↗</span></a><div class="promo-orb"></div></div><button class="profile-mini" data-account-open><span class="avatar account-avatar">G</span><span class="profile-text"><b class="account-label">Guest mode</b><small class="account-status">Sign in is optional</small></span><span class="more">···</span></button></div>
+    </aside>
+
+    <main class="main-content" id="home">
+      <header class="topbar"><button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button><div class="breadcrumbs"><span>YŪGEN</span> <span>/</span> <b id="breadcrumbPage">Home</b></div><div class="top-actions"><label class="search-box"><span>⌕</span><input id="searchInput" placeholder="Search anime, genre..." autocomplete="off"/><kbd>⌘ K</kbd></label><button class="icon-button notification" aria-label="Notifications">♧<i></i></button><button class="avatar top-avatar account-avatar" data-account-open aria-label="Account">G</button></div></header>
+
+      <div id="homePage" class="page-view">
+      <section class="hero" aria-label="Featured anime">
+        <img class="hero-image" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=2000&q=90" alt="Misty mountain landscape at dusk" />
+        <div class="hero-scrim"></div><div class="hero-grain"></div>
+        <div class="hero-content"><div class="eyebrow"><span class="live-dot"></span> THIS WEEK'S SPOTLIGHT</div><div class="hero-title">Beyond<br><em>the Horizon</em></div><p class="hero-copy">When the last star falls, one quiet wanderer discovers that the world is only the beginning.</p><div class="hero-meta"><span class="rating">★ <b>9.2</b></span><span>2025</span><span class="meta-sep">•</span><span>Adventure</span><span class="meta-sep">•</span><span>12 Episodes</span><span class="quality">4K</span></div><div class="hero-buttons"><button class="button-primary" data-open="horizon"><span>▶</span> Explore series</button><button class="button-ghost" data-add="horizon"><span>＋</span> My list</button></div><div class="hero-count"><span>01</span><i></i> 04</div></div>
+        <div class="hero-side-note">A STORY THAT STAYS WITH YOU <span>↗</span></div>
+      </section>
+
+      <div class="content-wrap">
+        <section class="section trending-section" id="discover"><div class="section-head"><div><div class="section-kicker">CURATED FOR YOU</div><h2>Trending <span>now</span></h2></div><div class="section-controls"><button class="round-arrow" id="scrollLeft" aria-label="Scroll left">←</button><button class="round-arrow" id="scrollRight" aria-label="Scroll right">→</button><a class="see-all" href="#catalog">See all <span>↗</span></a></div></div>
+          <div class="anime-row" id="trendingRow"></div>
+        </section>
+
+        <section class="section schedule-section" id="weekly"><div class="section-head compact-head"><div><div class="section-kicker">DON'T MISS A MOMENT</div><h2>Coming <span>this week</span></h2></div><button class="calendar-link">Full schedule <span>↗</span></button></div><div class="schedule-grid" id="scheduleGrid"></div></section>
+
+        <section class="section catalog-section" id="catalog"><div class="section-head compact-head"><div><div class="section-kicker">FIND YOUR NEXT OBSESSION</div><h2>Made for <span>your mood</span></h2></div><div class="filter-pills"><button class="filter-pill selected" data-filter="All">All anime</button><button class="filter-pill" data-filter="Action">Action</button><button class="filter-pill" data-filter="Fantasy">Fantasy</button><button class="filter-pill" data-filter="Romance">Romance</button></div></div><div class="catalog-grid" id="catalogGrid"></div></section>
+        <footer><a class="footer-brand" href="#home">幽 yūgen.</a><span>Stories beyond the ordinary.</span><span class="footer-right">© 2025 Yūgen · Made for the curious</span></footer>
+      </div>
+      </div>
+      <section class="standalone-page page-view" id="schedulePage" hidden><div class="page-hero schedule-hero"><span class="page-icon">◷</span><div><div class="section-kicker">EVERY EPISODE, ON TIME</div><h1>Release <span>schedule</span></h1><p>Keep up with the stories unfolding this week.</p></div><div class="page-orbit orbit-pink"></div></div><div class="schedule-page-toolbar"><div class="day-tabs" id="dayTabs"></div><span class="schedule-timezone">✦ All times shown in your local time</span></div><div class="schedule-page-grid" id="schedulePageGrid"></div></section>
+      <section class="standalone-page page-view" id="myListPage" hidden><div class="page-hero list-hero"><span class="page-icon">♡</span><div><div class="section-kicker">YOUR PERSONAL COLLECTION</div><h1>My <span>list</span></h1><p>Your next great watch is already waiting here.</p></div><div class="page-orbit orbit-gold"></div></div><div class="list-toolbar"><div><b id="listCount">0 titles</b><span> saved for later</span></div><button class="sort-button" id="sortList">Recently added <span>⌄</span></button></div><div class="catalog-grid list-grid" id="myListGrid"></div></section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal-backdrop account-backdrop" id="accountModal" aria-hidden="true"><section class="account-modal" role="dialog" aria-modal="true" aria-labelledby="accountTitle"><button class="modal-close" id="accountClose" aria-label="Close">×</button><div class="account-art"><span class="account-art-symbol">幽</span><span class="account-art-orbit"></span><div class="account-art-copy">YOUR WORLDS,<br><em>ALL IN ONE PLACE.</em></div><div class="account-art-foot">OPTIONAL ACCOUNT · GUESTS ALWAYS WELCOME</div></div><div class="account-form-wrap"><div class="account-brand">幽 <b>yūgen<span>.</span></b></div><div class="account-form-content"><div class="section-kicker" id="accountEyebrow">PICK UP WHERE YOU LEFT OFF</div><h2 id="accountTitle">Welcome back</h2><p class="account-subtitle">Sign in to sync your list across devices.</p><div class="account-tabs"><button type="button" class="account-tab selected" data-auth-mode="login">Sign in</button><button type="button" class="account-tab" data-auth-mode="signup">Create account</button></div><form id="accountForm"><label class="auth-field" id="nameField" hidden><span>Your name</span><input id="accountName" name="name" type="text" autocomplete="name" maxlength="50" placeholder="What should we call you?"></label><label class="auth-field"><span>Email address</span><input id="accountEmail" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"></label><label class="auth-field"><span>Password</span><input id="accountPassword" name="password" type="password" autocomplete="current-password" required minlength="10" maxlength="128" placeholder="At least 10 characters"></label><div class="auth-error" id="authError" role="alert"></div><button class="button-primary auth-submit" id="authSubmit" type="submit">Sign in <span>↗</span></button></form><div class="guest-divider"><span>OR</span></div><button class="guest-button" id="continueGuest">Continue as guest <span>→</span></button><p class="account-fineprint">Optional account. Your saved list stays on this device in guest mode.</p></div></div></section></div>
+  <div class="modal-backdrop" id="modal" aria-hidden="true"><section class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" aria-label="Close">×</button><div class="modal-art"><img id="modalImage" src="" alt=""><div class="modal-art-fade"></div><span class="modal-art-tag">YŪGEN ORIGINAL</span></div><div class="modal-info"><div class="section-kicker" id="modalGenre"></div><h2 id="modalTitle"></h2><div class="modal-meta" id="modalMeta"></div><p id="modalDescription"></p><div class="modal-actions"><button class="button-primary" id="watchButton">▶ &nbsp; Watch trailer</button><button class="button-ghost" id="modalAdd">＋ &nbsp; My list</button></div><div class="playback-note" id="playbackNote">Trailer playback will appear here when a licensed video source is connected.</div></div></section></div>
+  <script src="app.js"></script>
+</body>
+</html>
+
